@@ -1,1 +1,1 @@
-Find our dataset arxiv-0623 [here](https://drive.google.com/file/d/1frBGZu7RBtZ0kJLO_pWZLE8aQuu8PvtF/view?usp=sharing)
+Find our dataset arxiv-0623 [here](https://drive.google.com/file/d/1XEsOpIj64gOG3sFFAEbLFCzF0nkMP5ql/view?usp=sharing). This includes all papers (title, abstract, authors, citation counts from 07/29/2023) with the indicated arxiv categories between January 2023 and June 2023.
