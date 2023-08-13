@@ -19,6 +19,7 @@ from semanticscholar import SemanticScholar
 
 
 def search(queries=[], field="all", cats=["cs.CL", "cs.LG"]):  # cs.AI, cs.CV
+    # Use the arxiv API to query for papers from specified categories
     query_string, client = "", arxiv.Client(num_retries=40, page_size=1000)
     if queries:
         query_string += "(" + " OR ".join(f"{field}:{query}" for query in queries) + ")"
@@ -38,6 +39,7 @@ def _get_papers(
         paper_ids,
         fields: list = None
 ):
+    # Overwriting this method of the python semanticscholar API and allow papers that exist in arxiv but not semantic scholar
     if not fields:
         fields = Paper.SEARCH_FIELDS
 
@@ -56,6 +58,7 @@ def _get_papers(
 
 
 def get_papers(file="papers.shelf"):
+    # Get raw data from arxiv and semantic scholar and save it to papers.shelf
     papers = defaultdict(list)
 
     try:
@@ -103,6 +106,7 @@ sch.get_papers = types.MethodType(_get_papers, sch)
 
 
 def get_citations(batch):
+    # Get citation counts with overwritten semantic scholar batch api
     papers = sch.get_papers(paper_ids=batch)
     citation_counts = []
     for p in papers:
@@ -165,18 +169,13 @@ def regression(papers):
 if __name__ == "__main__":
     sb.set()
     papers = get_papers()
-    a = dict(papers)
-    b = a.values()
-    c = sum(b, [])
-    d = [vars(a) for a in c]
-
+    
     df = pd.DataFrame([vars(a) for a in sum(dict(papers).values(), [])])
 
+    # Currently we set weeks to begin sundays. We group by week and calculate the average per week as a new dataframe column
     df['WeekNumber'] = df['published'].dt.to_period('W-SAT')
 
     grouped = df.groupby('WeekNumber')
-
-
     groups = []
     for name, group in grouped:
         mean = group['citationCount'].mean()
@@ -185,6 +184,7 @@ if __name__ == "__main__":
 
         groups.append(group)
 
+    # Save dataframe with the normalized citation counts as csv file
     df = pd.concat(groups).sort_values('z-score', ascending=False)
     df['published'] = df['published'].dt.tz_localize(None)
     df['updated'] = df['updated'].dt.tz_localize(None)
